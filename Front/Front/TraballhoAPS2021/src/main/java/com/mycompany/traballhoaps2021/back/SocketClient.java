@@ -1,4 +1,9 @@
-package br.com.lab.socket;
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.mycompany.traballhoaps2021.back;
 
 import java.io.*;
 import java.net.Socket;
@@ -9,7 +14,12 @@ import java.util.Base64;
 import java.util.Scanner;
 import java.util.function.Function;
 
-public class SimpleClient {
+/**
+ *
+ * @author bruno
+ */
+public class SocketClient {
+    
     private static final String DOWNLOADS_FOLDER = "C:\\Users\\bruno\\Downloads";
     private String connectedUser;
     private String[] onlineUsers;
@@ -108,27 +118,5 @@ public class SimpleClient {
 
         return onlineUsers;
     }
-
-    public static void main(String[] args) throws IOException {
-        SimpleClient client = new SimpleClient();
-        client.startConnection("127.0.0.1", 4444);
-
-        System.out.println("Connecting to server...");
-
-        client.login("nicholas", "123");
-
-        Scanner scanner = new Scanner(System.in);
-
-        while (true) {
-            String message = scanner.nextLine();
-
-            if (message.equals("arquivo")) {
-                System.out.println("Digite o caminho completo do arquivo");
-                String file = scanner.nextLine();
-                client.sendFileTo("bruno", file);
-            } else {
-                client.sendMessageTo("bruno", message);
-            }
-        }
-    }
+    
 }
