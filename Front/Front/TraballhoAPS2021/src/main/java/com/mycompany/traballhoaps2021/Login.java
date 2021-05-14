@@ -26,10 +26,7 @@ public class Login extends javax.swing.JFrame {
             } catch (IOException ex) {
                 Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
             }
-            
-            
-            
-//            new Contatos().setVisible(true);
+           new Teste1().setVisible(true);
         });
     }
     
@@ -67,6 +64,11 @@ public class Login extends javax.swing.JFrame {
         });
 
         buttonStart.setText("Entrar");
+        buttonStart.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonStartActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -124,6 +126,10 @@ public class Login extends javax.swing.JFrame {
         // TODO add your handling code here:
         
     }//GEN-LAST:event_userActionPerformed
+
+    private void buttonStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonStartActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_buttonStartActionPerformed
 
     
     
