@@ -5,21 +5,67 @@
  */
 package com.mycompany.traballhoaps2021;
 
+import java.awt.event.KeyEvent;
+import java.io.IOException;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.AbstractSet;
+import java.util.HashSet;
+import java.util.Set;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+
 /**
  *
  * @author bruno
  */
 public class Teste1 extends javax.swing.JFrame {
-
+    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss");
+    private String selectedUser = "";
+    private Set<String> connectedUsers = new HashSet<>();
+    
     /**
      * Creates new form Teste1
      */
     public Teste1() {
         initComponents();
-        teste.addActionListener(e -> {
-            Login login = new Login();
-            login.setVisible(true);
-        });
+        
+        updateOnlineUsers(Session.socketClient.getOnlineUsers());
+        
+        Session.socketClient
+            .onUserConnection((users) -> {
+                updateOnlineUsers(users);
+            })
+            .onMessageReceive((user, message) -> {
+                if (message != null) {
+                    writeOnChat(user, message);
+                }
+            });
+    }
+    
+    private void clearUsersTable() {
+        DefaultTableModel tableModel = (DefaultTableModel)tblUsers.getModel();
+        int rowCount = tableModel.getRowCount();
+        
+        for (int i = rowCount - 1; i >= 0; i--) {
+            tableModel.removeRow(i);
+        }
+    }
+    
+    private void updateOnlineUsers(String[] users) {   
+        clearUsersTable();
+        
+        this.connectedUsers.addAll(Set.of(users));
+        
+        for (String user : this.connectedUsers) {
+            DefaultTableModel model = (DefaultTableModel)tblUsers.getModel();
+            model.addRow(new Object[] { user });
+        }
+    }
+    
+    private void writeOnChat(String user, String message) {
+        txtChat.append(String.format("[%s - %s] %s%n", LocalTime.now().format(TIME_FORMATTER), user, message));
     }
 
     /**
@@ -31,31 +77,125 @@ public class Teste1 extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        teste = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        txtChat = new javax.swing.JTextArea();
+        txtMessage = new javax.swing.JTextField();
+        btnSend = new javax.swing.JButton();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        tblUsers = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        teste.setText("jButton1");
+        txtChat.setEditable(false);
+        txtChat.setColumns(20);
+        txtChat.setFont(new java.awt.Font("Consolas", 0, 13)); // NOI18N
+        txtChat.setRows(5);
+        jScrollPane1.setViewportView(txtChat);
+
+        txtMessage.setEnabled(false);
+        txtMessage.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtMessageKeyReleased(evt);
+            }
+        });
+
+        btnSend.setText(">");
+        btnSend.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSendActionPerformed(evt);
+            }
+        });
+
+        tblUsers.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "Usuários"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        tblUsers.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblUsersMouseClicked(evt);
+            }
+        });
+        jScrollPane2.setViewportView(tblUsers);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(146, 146, 146)
-                .addComponent(teste)
-                .addContainerGap(181, Short.MAX_VALUE))
+                .addContainerGap()
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(txtMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 468, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnSend, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 518, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(106, 106, 106)
-                .addComponent(teste)
-                .addContainerGap(171, Short.MAX_VALUE))
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 229, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(btnSend)
+                            .addComponent(txtMessage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 263, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnSendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSendActionPerformed
+        if (txtMessage.getText() == null || txtMessage.getText().isBlank()) {
+            System.out.println("Escreva uma mensagem para enviar");
+            return;
+        }
+        
+        try {
+            Session.socketClient.sendMessageTo(selectedUser, txtMessage.getText());
+            writeOnChat(Session.socketClient.getConnectedUser(), txtMessage.getText());
+            txtMessage.setText("");
+        } catch (IOException e) {
+            System.err.println("Nao foi possivel enviar a mensagem");
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_btnSendActionPerformed
+
+    private void txtMessageKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtMessageKeyReleased
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            btnSendActionPerformed(null);
+        }
+    }//GEN-LAST:event_txtMessageKeyReleased
+
+    private void tblUsersMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblUsersMouseClicked
+        DefaultTableModel tableModel = (DefaultTableModel)tblUsers.getModel();
+        
+        this.selectedUser = String.valueOf(tableModel.getValueAt(tblUsers.getSelectedRow(), 0));
+        
+        if (this.selectedUser == null || this.selectedUser.isBlank()) {
+            txtMessage.setEnabled(false);
+        } else {
+            txtMessage.setEnabled(true);
+        }
+    }//GEN-LAST:event_tblUsersMouseClicked
 
     /**
      * @param args the command line arguments
@@ -93,6 +233,11 @@ public class Teste1 extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton teste;
+    private javax.swing.JButton btnSend;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JTable tblUsers;
+    private javax.swing.JTextArea txtChat;
+    private javax.swing.JTextField txtMessage;
     // End of variables declaration//GEN-END:variables
 }

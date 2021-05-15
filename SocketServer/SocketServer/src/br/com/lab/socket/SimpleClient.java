@@ -35,6 +35,7 @@ public class SimpleClient {
 
     public void sendMessageTo(String userToSend, String message) throws IOException {
         sendMessage(userToSend + ":" + message);
+        sendMessage(userToSend + ":message:" + this.connectedUser + ":" + message);
     }
 
     public void sendFileTo(String userToSend, String filePath) throws IOException {
@@ -58,8 +59,11 @@ public class SimpleClient {
                     if (message.contains(":")) {
                         String[] commands = message.split(":");
 
-                        if (commands.length == 2) {
+                        if (commands.length > 1) {
                             switch (commands[0]) {
+                                case "message":
+                                    receiveMessage(commands);
+                                    break;
                                 case "users":
                                     updateOnlineUsers(commands[1]);
                                     break;
@@ -69,7 +73,6 @@ public class SimpleClient {
                             }
                         }
                     } else {
-                        // TODO: Momento de recepcao de mensagem. Trocar para tela do chat
                         System.out.println(message);
                     }
                 }
@@ -77,6 +80,10 @@ public class SimpleClient {
                 e.printStackTrace();
             }
         }).start();
+    }
+
+    private void receiveMessage(String[] message) {
+        System.out.println(String.join(":", message));
     }
 
     private void updateOnlineUsers(String users) {
@@ -115,7 +122,7 @@ public class SimpleClient {
 
         System.out.println("Connecting to server...");
 
-        client.login("nicholas", "123");
+        client.login("danillo", "123");
 
         Scanner scanner = new Scanner(System.in);
 

@@ -26,6 +26,8 @@ public class SocketClient {
     private Socket socket;
     private PrintWriter out;
     private BufferedReader in;
+    private MessageReceiveCallback messageReceiveCallback;
+    private UserConnectionCallback userConnectionCallback;
 
     public void startConnection(String ip, int port) throws IOException {
         socket = new Socket(ip, port);
@@ -44,7 +46,7 @@ public class SocketClient {
     }
 
     public void sendMessageTo(String userToSend, String message) throws IOException {
-        sendMessage(userToSend + ":" + message);
+        sendMessage(userToSend + ":message:" + this.connectedUser + ":" + message);
     }
 
     public void sendFileTo(String userToSend, String filePath) throws IOException {
@@ -68,8 +70,11 @@ public class SocketClient {
                     if (message.contains(":")) {
                         String[] commands = message.split(":");
 
-                        if (commands.length == 2) {
+                        if (commands.length > 1) {
                             switch (commands[0]) {
+                                case "message":
+                                    receiveMessage(commands);
+                                    break;
                                 case "users":
                                     updateOnlineUsers(commands[1]);
                                     break;
@@ -78,9 +83,8 @@ public class SocketClient {
                                     break;
                             }
                         }
-                    } else {
-                        // TODO: Momento de recepcao de mensagem. Trocar para tela do chat
-                        System.out.println(message);
+                    } else {      
+                        System.out.println(message);                        
                     }
                 }
             } catch (IOException e) {
@@ -88,12 +92,38 @@ public class SocketClient {
             }
         }).start();
     }
+    
+    private void receiveMessage(String[] message) {
+        System.out.println(message);
+        
+        if (messageReceiveCallback != null) {
+            try {
+                if (message.length == 3) {
+                    messageReceiveCallback.onMessage(message[1], message[2]);
+                } else {
+                    messageReceiveCallback.onMessage("anonymous", message[1]);
+                }
+            } catch (Throwable e) {
+                System.out.println("Nao foi possivel executar funcao de callback para recebimento de mensagem");
+                e.printStackTrace();
+            }
+        }
+    }
 
     private void updateOnlineUsers(String users) {
         this.onlineUsers = users.split(";");
         // TODO: Momento que retorna os usuarios logados para exibir na lista do chat
         for (int i = 0; i < this.onlineUsers.length; i++) {
             System.out.println("Usuario logado: " + this.onlineUsers[i]);
+        }
+        
+        if (userConnectionCallback != null) {
+            try {
+                userConnectionCallback.onUserConnection(this.onlineUsers);
+            } catch (Throwable e) {
+                System.out.println("Nao foi possivel executar funcao de callback para conexao de usuarios");
+                e.printStackTrace();
+            }
         }
     }
 
@@ -105,6 +135,18 @@ public class SocketClient {
         OutputStream writer = Files.newOutputStream(Path.of(DOWNLOADS_FOLDER, fileName));
         writer.write(bytes);
         writer.close();
+    }
+    
+    public SocketClient onUserConnection(UserConnectionCallback callback) {
+        this.userConnectionCallback = callback;
+        
+        return this;
+    }
+    
+    public SocketClient onMessageReceive(MessageReceiveCallback callback) {
+        this.messageReceiveCallback = callback;
+        
+        return this;
     }
 
     public String getConnectedUser() {
