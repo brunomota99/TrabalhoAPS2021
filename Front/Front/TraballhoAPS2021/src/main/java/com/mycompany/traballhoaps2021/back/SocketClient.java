@@ -28,6 +28,7 @@ public class SocketClient {
     private BufferedReader in;
     private MessageReceiveCallback messageReceiveCallback;
     private UserConnectionCallback userConnectionCallback;
+    private FileReceiveCallback fileReceiveCallback;
 
     public void startConnection(String ip, int port) throws IOException {
         socket = new Socket(ip, port);
@@ -54,7 +55,7 @@ public class SocketClient {
         byte[] bytes = Files.readAllBytes(path);
         String base64 = Base64.getEncoder().encodeToString(bytes);
 
-        sendMessage(userToSend + ":file:" + path.getFileName().toString() + ";" + base64);
+        sendMessage(userToSend + ":file:" + this.connectedUser + ":" + path.getFileName().toString() + ";" + base64);
     }
 
     public void sendMessage(String message) throws IOException {
@@ -128,13 +129,17 @@ public class SocketClient {
     }
 
     private void saveFile(String[] fileCommand) throws IOException {
-        String[] fileMessage = fileCommand[1].split(";");
+        String[] fileMessage = fileCommand[2].split(";");
         String fileName = fileMessage[0];
         String fileContent = fileMessage[1];
         byte[] bytes = Base64.getDecoder().decode(fileContent);
         OutputStream writer = Files.newOutputStream(Path.of(DOWNLOADS_FOLDER, fileName));
         writer.write(bytes);
         writer.close();
+        
+        if (fileReceiveCallback != null) {
+            fileReceiveCallback.onFileReceive(fileCommand[1], fileName);
+        }
     }
     
     public SocketClient onUserConnection(UserConnectionCallback callback) {
@@ -145,6 +150,12 @@ public class SocketClient {
     
     public SocketClient onMessageReceive(MessageReceiveCallback callback) {
         this.messageReceiveCallback = callback;
+        
+        return this;
+    }
+    
+    public SocketClient onFileReceive(FileReceiveCallback callback) {
+        this.fileReceiveCallback = callback;
         
         return this;
     }

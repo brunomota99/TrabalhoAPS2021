@@ -26,7 +26,7 @@ public class Login extends javax.swing.JFrame {
             } catch (IOException ex) {
                 Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
             }
-           new Teste1().setVisible(true);
+           new Chat().setVisible(true);
            this.setVisible(false);
         });
     }
