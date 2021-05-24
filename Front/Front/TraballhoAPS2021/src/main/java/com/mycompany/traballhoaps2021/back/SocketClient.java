@@ -20,7 +20,7 @@ import java.util.function.Function;
  */
 public class SocketClient {
     
-    private static final String DOWNLOADS_FOLDER = "C:\\Users\\bruno\\Downloads";
+    private static final String DOWNLOADS_FOLDER = "C:\\Users\\bruno\\Downloads\\ChatFiles";
     private String connectedUser;
     private String[] onlineUsers;
     private Socket socket;
